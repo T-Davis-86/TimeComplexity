@@ -1,0 +1,252 @@
+import random
+import time
+import matplotlib.pyplot as plt
+import numpy as np
+
+class Node(): #Creates a Node instance that contains the nodes value and pointer to the next node
+  def __init__(self,value,next_Node = None):
+      self.value = value # The Nodes value
+      self.nextNode = next_Node # Pointer for the Next Node in the list
+
+class Linked_List(): # This class allows for Singly-Linked-List to be created and linked together
+  def __init__(self,head = None,tail = None):
+      self._head = head # This is the head or start of the list
+
+  # This is to add a Node to the tail of the Linked List
+  def append(self,value):
+        new_node = Node(value)
+        if self._head is None:
+            self._head = new_node
+        else:
+            new_node.nextNode = self._head
+            self._head = new_node
+
+  # Much like append() this is to "insert" a Node a specific position in the linked list
+  # by tracking the current Nodes next point and the previous Nodes next pointer
+  def Insert(self,value,where):
+      currentNode = self._head
+      target = False
+      prevNode = None
+      while currentNode and target is False:
+          if currentNode.value == where:
+              target = True
+          else:
+              prevNode = currentNode
+              currentNode = currentNode.nextNode
+      if currentNode is None:
+             #print("That number doesn't exist!")	#Incase the node position isn't in the list
+              return
+      elif prevNode is None:
+          node = Node(value)
+          node.nextNode = currentNode	# This allows for a new Node to be added to the front of the list
+          self._head = node
+          return
+      else:
+          node = Node(value)
+          prevNode.nextNode = node
+          node.nextNode = currentNode	# This puts the new Node in the selected spot of the list
+          return
+
+  # This allows a Node to be removed from the list by keeping track of the current head and the previous head
+  def popped(self,value):
+      currentNode = self._head
+      prevNode = None
+      target = False
+      while currentNode and target is False: # This is iterate through the list for find the node to delete
+          if currentNode.value == value:
+              target = True
+          else:
+              prevNode = currentNode
+              currentNode = currentNode.nextNode
+      if currentNode is None:
+              #print("Number isn't in the list!") # This is incase the node doesn't exist
+              return
+      if prevNode is None:
+          self._head = currentNode.nextNode # This is for the number at the front of the list
+      else:
+          prevNode.nextNode = currentNode.nextNode
+
+  # This method allows for the list to be printed out
+  def Print(self):
+      currentNode = self._head
+      while True:
+          if currentNode is None:
+              print("None")
+              break
+          else:
+              print(currentNode.value,"->", end=" ") # uses "->" to point to the next node in the list
+              currentNode = currentNode.nextNode
+
+  # This method gets the highest number in the linked list
+  def maximum(self):
+    if self._head is None:
+        #print("None")
+        return None
+    currentNode = self._head
+    max_value = currentNode.value
+    while currentNode is not None:
+        if currentNode.value > max_value:
+            max_value = currentNode.value
+        currentNode = currentNode.nextNode
+    return max_value
+
+  # This method gets the smallest number in the linked list
+  def minimum(self):
+    if self._head is None:
+        return None
+    currentNode = self._head
+    min_value = currentNode.value
+    while currentNode is not None:
+        if currentNode.value < min_value:
+            min_value = currentNode.value
+        currentNode = currentNode.nextNode
+    return min_value
+
+  # This method gets the length of the entire linked list, allowing insertion at a random spot
+  def get_length(self):
+    currentNode = self._head
+    length1 = 0
+    while currentNode is not None:
+        length1 += 1
+        currentNode = currentNode.nextNode
+    return length1
+
+  # This method finds a particular number in the linked list
+  def get_num(self, num):
+    if self._head is None:
+        return None
+    currentNode = self._head
+    while currentNode is not None:
+        if currentNode.value == num:
+          #print("Found")
+          break
+        else:
+          currentNode = currentNode.nextNode
+
+# Function designed to time the performance of each action
+def performance_test(action,value = 0,pos = 0):
+  if action == "insert mid":
+    in_time1 = time.time()
+    example.Insert(value,pos)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    insert_mid_times.append(in_time)
+  elif action == "insert back":
+    in_time1 = time.time()
+    example.Insert(value,pos)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    insert_back_times.append(in_time)
+  elif action == "insert front":
+    in_time1 = time.time()
+    example.append(value)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    insert_front_times.append(in_time)
+  elif action == "search":
+    in_time1 = time.time()
+    example.get_num(value)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    search_times.append(in_time)
+  elif action == "delete front":
+    in_time1 = time.time()
+    example.popped(value)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    delete_front_times.append(in_time)
+  elif action == "delete back":
+    in_time1 = time.time()
+    example.popped(value)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    delete_back_times.append(in_time)
+  elif action == "delete mid":
+    in_time1 = time.time()
+    example.popped(value)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    delete_mid_times.append(in_time)
+  elif action == "find max":
+    in_time1 = time.time()
+    example.maximum()
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    max_times.append(in_time)
+  elif action == "find min":
+    in_time1 = time.time()
+    example.minimum()
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    min_times.append(in_time)
+
+# Function that produces the graph
+def get_graph(x,y,title):
+    xpoints = np.array(x)
+    ypoints = np.array(y)
+    plt.title(title)
+    plt.xlabel("Number of nodes")
+    plt.ylabel("Time to process")
+    plt.scatter(xpoints, ypoints)
+    plt.show()
+
+# Create the linked list
+example = Linked_List()
+
+# Creating lists for the time to go into
+min_times = []
+max_times = []
+search_times = []
+delete_front_times=[]
+delete_mid_times = []
+delete_back_times = []
+insert_front_times = []
+insert_mid_times = []
+insert_back_times = []
+t_times = []
+
+elem = 10
+while elem <= 100000:
+  t_times.append(elem)
+# Adding elements to the linked list
+  for x in range(1,elem):
+      example.append(x)
+
+  # Getting the length of the linked list
+  length = example.get_length()
+
+  # Getting the largest number from the linked list
+  maxi = example.maximum()
+
+  # Getting the smallest number from the linked list
+  mini = example.minimum()
+
+
+  # search for a specific number
+  performance_test("find max")
+  performance_test("find min")
+  performance_test("search",(random.randint(1,elem)))
+
+  # Deleting nodes
+  performance_test("delete front",1)
+  performance_test("delete back",length)
+  performance_test("delete mid",(length/2))
+
+  # Inserting a new node
+  performance_test("insert back",1,length)
+  performance_test("insert mid",1,(length/2))
+  performance_test("insert front",1)
+
+  # incrementing to the next data size
+  elem += 500
+
+# Graphing the the performance
+get_graph(t_times,min_times,"Finding Minimum Value Node")
+get_graph(t_times,max_times,"Finding Max Value Node")
+get_graph(t_times,search_times, "Search For a Value")
+get_graph(t_times, delete_front_times, "Deleting front Node")
+get_graph(t_times, delete_mid_times, "Deleting Mid Nodes")
+get_graph(t_times, delete_back_times, "Deleteing Back Nodes")
+get_graph(t_times,insert_front_times,"Inserting a New Node to the Front" )
+get_graph(t_times,insert_mid_times, "Inserting a New Node in the Middle")
+get_graph(t_times,insert_back_times, "Inserting a New Node to the Back")
