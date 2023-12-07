@@ -1,0 +1,212 @@
+import random
+import timeit
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Creates the node class for the Binary Tree
+class Node:
+  def __init__(self, key):
+      self.value = key
+      self.left = None
+      self.right = None
+
+# Creates the General Binary Tree class
+class Binary_Tree:
+  def __init__(self,value):
+      self.root = Node(value)
+
+  # Method inserts a new node with a value into the tree
+  def insert(self,root,value):
+        if root is None:
+            return Node(value)
+        if value < root.value:
+            root.left = self.insert(root.left, value)
+        elif value > root.value:
+            root.right = self.insert(root.right, value)
+        return root
+
+  # Method is used to search for a specific value in the tree
+  def search_tree(self, root, value):
+      if root is None:
+          return False
+      if root.value == value:
+          #print("True")
+          return True
+      return self.search_tree(root.left, value) or self.search_tree(root.right, value)
+
+  # Method is used to display the tree
+  def display_tree(self,root, level=0, prefix="Root: "):
+      if root is not None:
+          print(" " * (level * 4) + prefix + str(root.value))
+          if root.left is not None or root.right is not None:
+            self.display_tree(root.left,(level + 1), "L--- ")
+            self.display_tree(root.right,(level + 1), "R--- ")
+
+  # Method is used to delete a node from the tree
+  def delete_leaf(self, root, key):
+      if root is None:
+          return root
+      if key < root.value:
+          root.left = self.delete_leaf(root.left, key)
+      elif key > root.value:
+          root.right = self.delete_leaf(root.right, key)
+      else:
+          if root.left is None:
+              return root.right
+          elif root.right is None:
+              return root.left
+          min_right = self.minimum_value(root.right)
+          root.value = min_right
+          root.right = self.delete_leaf(root.right, min_right)
+      return root
+
+  # Method is used to find the min value in the tree
+  def minimum_value(self, root, current_minimum = 0):
+    if root is None:
+        return current_minimum
+    current_minimum = min(current_minimum, root.value)
+    left_minimum = self.minimum_value(root.left, current_minimum)
+    right_minimum = self.minimum_value(root.right, current_minimum)
+    return min(left_minimum, right_minimum)
+
+  # Method is used to find the max value in the tree
+  def maximum_value(self, root, current_maximum=0):
+    if root is None:
+        return current_maximum
+    current_maximum = max(current_maximum, root.value)
+    left_maximum = self.maximum_value(root.left, current_maximum)
+    right_maximum = self.maximum_value(root.right, current_maximum)
+    return max(left_maximum, right_maximum)
+
+# Function designed to time the performance of each action
+def performance_test(root,action,value = 0):
+  if action == "insert":
+    in_time1 = time.time()
+    tree.insert(root,value)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    insert_times.append(in_time)
+    avg = average(insert_times)
+    avg_insert_times.append(avg)
+  elif action == "search":
+    in_time1 = time.time()
+    tree.search_tree(root, value)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    search_times.append(in_time)
+    avg = average(search_times)
+    avg_search_times.append(avg)
+  elif action == "delete min":
+    in_time1 = time.time()
+    tree.delete_leaf(root, value)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    delete_min_times.append(in_time)
+    avg = average(delete_min_times)
+    avg_delete_min_times.append(avg)
+  elif action == "delete max":
+    in_time1 = time.time()
+    tree.delete_leaf(root, value)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    delete_max_times.append(in_time)
+    avg = average(delete_max_times)
+    avg_delete_max_times.append(avg)
+  elif action == "delete root":
+    in_time1 = time.time()
+    tree.delete_leaf(root, value)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    delete_root_times.append(in_time)
+    avg = average(delete_root_times)
+    avg_delete_root_times.append(avg)
+  elif action == "find max":
+    in_time1 = time.time()
+    tree.maximum_value(root)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    max_times.append(in_time)
+    avg = average(max_times)
+    avg_max_times.append(avg)
+  elif action == "find min":
+    in_time1 = time.time()
+    tree.minimum_value(root)
+    in_time2 = time.time()
+    in_time = in_time2 - in_time1
+    min_times.append(in_time)
+    avg = average(min_times)
+    avg_min_times.append(avg)
+
+#averaging the performance values to clean up the graph
+def average(list):
+    return sum(list) / len(list)
+
+# Function used for graphing the points collected to show performance
+def get_graph(x,y,title):
+    xpoints = np.array(x)
+    ypoints = np.array(y)
+    plt.scatter(xpoints, ypoints)
+    plt.title(title)
+    plt.xlabel("Number of nodes")
+    plt.ylabel("Time to process")
+    plt.show()
+
+# determine number nodes in the tree and root value and initializing the tree with the root and adding nodes to the tree
+num_nodes = 100
+t_times = []
+max_times = []
+avg_max_times = []
+min_times = []
+avg_min_times = []
+delete_min_times = []
+avg_delete_min_times = []
+delete_root_times = []
+avg_delete_root_times = []
+delete_max_times = []
+avg_delete_max_times = []
+search_times = []
+avg_search_times = []
+insert_times = []
+avg_insert_times = []
+
+while num_nodes <= 100000:
+  t_times.append(num_nodes)
+  root_value = num_nodes // 2
+  tree = Binary_Tree(root_value)
+  keys = []
+  for i in range(num_nodes):
+      keys.append(random.randint(1,100))
+
+  # Adding the unsorted listed to the tree
+  for key in keys:
+    tree.root = tree.insert(tree.root, key)
+
+  mini = tree.minimum_value(tree.root)
+  maxi = tree.maximum_value(tree.root)
+
+  # Getting the Max Value from the tree
+  performance_test(tree.root,"find max")
+  performance_test(tree.root,"find min")
+
+  # Searching for a node in the tree
+  performance_test(tree.root,"search",random.randint(1,100))
+
+  # Deleting a node from the tree
+  performance_test(tree.root,"delete min",mini)
+  performance_test(tree.root,"delete max",maxi)
+  performance_test(tree.root,"delete root",tree.root.value)
+
+  # Inserting a new value into the tree
+  performance_test(tree.root,"insert",random.randint(1, 100))
+
+  # Incrementing the data size
+  num_nodes += 500
+
+# Calls the get_graph() to build and display graph
+get_graph(t_times,min_times,"Finding Minimum Value Node")
+get_graph(t_times,max_times,"Finding Max Value Node")
+get_graph(t_times,search_times, "Search For a Value")
+get_graph(t_times, delete_min_times, "Deleting Min Value Node")
+get_graph(t_times, delete_root_times, "Deleting Root Nodes")
+get_graph(t_times, delete_max_times, "Deleteing Max Value Nodes")
+get_graph(t_times,insert_times,"Inserting a New Node" )
